@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Location Map</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style type='text/css'>body{margin-top:1px;padding:0;overflow:hidden;font-family:'Segoe UI',Helvetica,Arial,Sans-Serif}
+        
+        .input-gro button:hover,
+.input-gro button:focus {
+	background: #292929;
+	background: linear-gradient(#393939, #292929);
+	color: #5f5;
+	outline: none;
+}
+
+.form-cont{
+  border-bottom: 1px solid white;
+  border-top: 0px solid white;
+  border-left: 0px solid white;
+  color: #000;
+  opacity: 1;
+  width: 90%;
+  height: 40px;
+  margin-left: 7px;
+  padding: 10px;
+  background-color: #000;
+  
+}
+.tiwari{
+    height: 40px;
+    width: 8%;
+    margin-right: 0px;
+}
+
+@media only screen and (max-width: 1170px) {
+.input-gro {
+    height: 200px;
+  }
+  .form-cont{
+      height: 70px;
+  }
+  .tiwari{
+      height: 70px;
+  }
+}
+
+@keyframes glow {
+    0% {
+		border-color: #393;
+    
+		box-shadow: 0 0 5px rgba(0,255,0,.2), inset 0 0 5px rgba(0,255,0,.1), 0 2px 0 #000;
+    }	
+    100% {
+		border-color: #6f6;
+		box-shadow: 0 0 20px rgba(0,255,0,.6), inset 0 0 10px rgba(0,255,0,.4), 0 2px 0 #000;
+    }
+}
+.input-gro {
+	animation: glow 800ms ease-out infinite alternate;
+	background: #222922;
+	background: linear-gradient(#333933, #222922);
+	border-color: #393;
+	box-shadow: 0 0 5px rgba(0,255,0,.2), inset 0 0 5px rgba(0,255,0,.1), 0 2px 0 #000;
+	color: #efe;
+    outline: none;
+    margin-right: 0px;
+    
+}
+
+.input-gro input:focus{
+  color: white;
+}
+        </style>
+        
+    </head>
+    <body>
+        
+            
+        
+       
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-gro">
+                <div id='searchBoxContainer'><input type="text" class="form-cont" id= 'searchBox' style="background-color: transparent" name="city" placeholder="Enter a location ... ">
+                <input class="tiwari" style="background: transparent"value="Search" type="submit">
+            </div>
+        </form>
+        
+        <div class="container">
+                <div class="row">
+           {% if current_temperature %}
+                    <div class="col-md-6 col-sm-6 col-xs-12 "  >
+                        <h5>Current Temperature : {{ current_temperature }}</h5>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 "><h5>Humidity : {{ current_humidiy }}</h5></div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 "><h5>Pressure : {{ current_pressure }}</h5></div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 "><h5>Wind Speed : {{ wind_speed }}</h5></div>
+                    {% endif %} 
+                </div>
+                <div id='printoutPanel' style="display: inline;"></div>
+            </div>
+            </div>
+
+        <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+        <script type='text/javascript'>
+            function loadMapScenario() {
+                var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                    /* No need to set credentials if already passed in URL */
+                    center: new Microsoft.Maps.Location(47.606209, -122.332071),
+                    zoom: 12
+                });
+                Microsoft.Maps.loadModule('Microsoft.Maps.AutoSuggest', function () {
+                    var options = {
+                        maxResults: 4,
+                        map: map
+                    };
+                    var manager = new Microsoft.Maps.AutosuggestManager(options);
+                    manager.attachAutosuggest('#searchBox', '#searchBoxContainer', selectedSuggestion);
+                });
+                function selectedSuggestion(suggestionResult) {
+                    map.entities.clear();
+                    map.setView({ bounds: suggestionResult.bestView });
+                    var pushpin = new Microsoft.Maps.Pushpin(suggestionResult.location);
+                    map.entities.push(pushpin);
+                    document.getElementById('printoutPanel').innerHTML =
+                        'Suggestion: ' + suggestionResult.formattedSuggestion +
+                            '<br> Lat: ' + suggestionResult.location.latitude +
+                            '<br> Lon: ' + suggestionResult.location.longitude;
+                }
+                
+            }
+        </script>
+
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=ArgjOhvEMs4rvS0fbr9-5c03tjOqOIMx1WsGBgNJeuifo7L5tjaAg0xnXEV_KOdL&callback=loadMapScenario' async defer></script>
+
+
+    
+</body>
+</html>
